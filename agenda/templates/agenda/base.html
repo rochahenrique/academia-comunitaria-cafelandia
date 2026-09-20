@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Academia Comunitária{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'agenda/style.css' %}">
+</head>
+<body>
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  <header>
+    <nav aria-label="Menu principal">
+      <a class="marca" href="{% url 'agenda:home' %}">Academia Comunitária</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'agenda:agendar' %}">Agendar</a>
+        <form method="post" action="{% url 'logout' %}" class="form-sair">
+          {% csrf_token %}
+          <button type="submit">Sair ({{ user.username }})</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">Entrar</a>
+        <a href="{% url 'agenda:cadastro' %}">Cadastrar</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main id="conteudo">
+    {% if messages %}
+      <ul class="mensagens" role="status">
+        {% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+    {% block conteudo %}{% endblock %}
+  </main>
+</body>
+</html>
