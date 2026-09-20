@@ -1,0 +1,27 @@
+* { box-sizing: border-box; }
+body { font-family: Arial, sans-serif; font-size: 1.1rem; line-height: 1.5;
+       margin: 0; color: #1a1a1a; background: #f5f7fa; }
+header { background: #0b3d66; }
+nav { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+      max-width: 60rem; margin: 0 auto; padding: 0.75rem 1rem; }
+nav a, .form-sair button { color: #fff; font-size: 1rem; }
+.marca { font-weight: bold; font-size: 1.2rem; margin-right: auto; text-decoration: none; }
+.form-sair button { background: none; border: 0; cursor: pointer; text-decoration: underline; }
+main { max-width: 60rem; margin: 0 auto; padding: 1rem; }
+a:focus, button:focus, input:focus, select:focus { outline: 3px solid #ffbf47; }
+.pular { position: absolute; left: -999px; }
+.pular:focus { left: 0; background: #fff; padding: 0.5rem; }
+.botao, button { display: inline-block; background: #0b3d66; color: #fff; border: 0;
+                 border-radius: 6px; padding: 0.6rem 1rem; font-size: 1rem;
+                 text-decoration: none; cursor: pointer; }
+button.perigo { background: #a61e1e; }
+input, select { font-size: 1rem; padding: 0.4rem; max-width: 100%; }
+.mensagens { list-style: none; padding: 0; }
+.mensagens li { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 0.5rem; }
+.mensagens .success { background: #d8f0dc; border: 1px solid #2e7d32; }
+.mensagens .error { background: #f9dcdc; border: 1px solid #a61e1e; }
+.errorlist { color: #a61e1e; padding-left: 1.2rem; }
+.tabela-rolavel { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+th, td { border: 1px solid #ccd3db; padding: 0.6rem; text-align: left; }
+caption { text-align: left; font-weight: bold; padding: 0.5rem 0; }
