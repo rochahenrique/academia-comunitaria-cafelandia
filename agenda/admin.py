@@ -1,6 +1,10 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
+from django.core.mail import EmailMessage
 
 from .models import Agendamento, Comunicado, Grupo, Horario
+
+User = get_user_model()
 
 
 @admin.register(Grupo)
@@ -26,3 +30,22 @@ class AgendamentoAdmin(admin.ModelAdmin):
 class ComunicadoAdmin(admin.ModelAdmin):
     list_display = ("titulo", "tipo", "criado_em")
     list_filter = ("tipo",)
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.autor = request.user
+        super().save_model(request, obj, form, change)
+
+        # Aviso de manutenção por e-mail (RF07)
+        if not change and obj.tipo == "manutencao":
+            destinatarios = list(
+                User.objects.filter(is_active=True)
+                .exclude(email="")
+                .values_list("email", flat=True)
+            )
+            if destinatarios:
+                EmailMessage(
+                    subject=f"Aviso: {obj.titulo}",
+                    body=obj.mensagem,
+                    bcc=destinatarios,
+                ).send()

@@ -12,8 +12,12 @@
   <header>
     <nav aria-label="Menu principal">
       <a class="marca" href="{% url 'agenda:home' %}">Academia Comunitária</a>
+       <a href="{% url 'agenda:comunicados' %}">Comunicados</a>
       {% if user.is_authenticated %}
         <a href="{% url 'agenda:agendar' %}">Agendar</a>
+        {% if user.is_staff %}
+          <a href="{% url 'agenda:relatorio' %}">Relatório</a>
+        {% endif %}
         <form method="post" action="{% url 'logout' %}" class="form-sair">
           {% csrf_token %}
           <button type="submit">Sair ({{ user.username }})</button>

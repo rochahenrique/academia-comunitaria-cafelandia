@@ -1,14 +1,17 @@
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.mail import send_mail
 from django.db import IntegrityError, transaction
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .forms import AgendamentoForm, CadastroForm
-from .models import Agendamento
+from .forms import AgendamentoForm, CadastroForm, RelatorioForm
+from .models import Agendamento, Comunicado, Horario
 
 
 def _grupo_do_usuario(usuario):
@@ -100,3 +103,74 @@ def cancelar(request, pk):
         _enviar_email(request.user, agendamento, "cancelado")
         messages.success(request, "Agendamento cancelado.")
     return redirect("agenda:home")
+
+def comunicados(request):
+    """Lista pública de comunicados e regras de uso (RF04)."""
+    return render(
+        request, "agenda/comunicados.html", {"comunicados": Comunicado.objects.all()}
+    )
+
+
+def _ocorrencias(inicio, fim, dia_semana):
+    """Quantas vezes um dia da semana aparece entre duas datas."""
+    total_dias = (fim - inicio).days + 1
+    return sum(
+        1
+        for i in range(total_dias)
+        if (inicio + timedelta(days=i)).weekday() == dia_semana
+    )
+
+
+@user_passes_test(lambda u: u.is_staff, login_url="login")
+def relatorio(request):
+    """Relatório de utilização, restrito ao administrador (RF06)."""
+    form = RelatorioForm(request.GET or None)
+    resultado = None
+
+    if form.is_valid():
+        inicio = form.cleaned_data["data_inicio"]
+        fim = form.cleaned_data["data_fim"]
+        base = Agendamento.objects.filter(data__range=(inicio, fim))
+        confirmados = base.filter(status="confirmado")
+
+        horarios = Horario.objects.filter(ativo=True).annotate(
+            total=Count(
+                "agendamentos",
+                filter=Q(
+                    agendamentos__status="confirmado",
+                    agendamentos__data__range=(inicio, fim),
+                ),
+            )
+        )
+        linhas = []
+        vagas_totais = 0
+        for h in horarios:
+            vagas = _ocorrencias(inicio, fim, h.dia_semana)
+            vagas_totais += vagas
+            linhas.append(
+                {
+                    "horario": h,
+                    "total": h.total,
+                    "vagas": vagas,
+                    "ocupacao": round(100 * h.total / vagas) if vagas else 0,
+                }
+            )
+
+        total_confirmados = confirmados.count()
+        resultado = {
+            "inicio": inicio,
+            "fim": fim,
+            "confirmados": total_confirmados,
+            "cancelados": base.filter(status="cancelado").count(),
+            "ocupacao_geral": (
+                round(100 * total_confirmados / vagas_totais) if vagas_totais else 0
+            ),
+            "por_horario": linhas,
+            "por_grupo": confirmados.values("grupo__nome")
+            .annotate(total=Count("id"))
+            .order_by("-total"),
+        }
+
+    return render(
+        request, "agenda/relatorio.html", {"form": form, "resultado": resultado}
+    )

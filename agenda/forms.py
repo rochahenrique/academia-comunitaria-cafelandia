@@ -62,3 +62,26 @@ class AgendamentoForm(forms.Form):
             ).exists():
                 raise ValidationError("Este horário já está reservado nesta data.")
         return dados
+
+class RelatorioForm(forms.Form):
+    """Período do relatório de utilização (RF06)."""
+
+    data_inicio = forms.DateField(
+        label="De", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    data_fim = forms.DateField(
+        label="Até", widget=forms.DateInput(attrs={"type": "date"})
+    )
+
+    def clean(self):
+        dados = super().clean()
+        inicio = dados.get("data_inicio")
+        fim = dados.get("data_fim")
+        if inicio and fim:
+            if fim < inicio:
+                raise ValidationError(
+                    "A data final deve ser igual ou posterior à inicial."
+                )
+            if (fim - inicio).days > 366:
+                raise ValidationError("O período máximo é de 1 ano.")
+        return dados

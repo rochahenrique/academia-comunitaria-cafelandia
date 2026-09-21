@@ -9,4 +9,6 @@ urlpatterns = [
     path("cadastro/", views.cadastro, name="cadastro"),
     path("agendar/", views.agendar, name="agendar"),
     path("agendamentos/<int:pk>/cancelar/", views.cancelar, name="cancelar"),
+    path("comunicados/", views.comunicados, name="comunicados"),
+    path("relatorio/", views.relatorio, name="relatorio"),
 ]

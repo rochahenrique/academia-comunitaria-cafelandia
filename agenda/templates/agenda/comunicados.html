@@ -1,0 +1,14 @@
+{% extends "agenda/base.html" %}
+{% block titulo %}Comunicados{% endblock %}
+{% block conteudo %}
+<h1>Comunicados e regras de uso</h1>
+{% for c in comunicados %}
+  <article class="comunicado">
+    <h2>{{ c.titulo }}</h2>
+    <p class="meta">{{ c.get_tipo_display }} · {{ c.criado_em|date:"d/m/Y" }}</p>
+    <p>{{ c.mensagem|linebreaksbr }}</p>
+  </article>
+{% empty %}
+  <p>Nenhum comunicado publicado.</p>
+{% endfor %}
+{% endblock %}
