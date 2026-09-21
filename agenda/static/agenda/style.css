@@ -25,3 +25,7 @@ input, select { font-size: 1rem; padding: 0.4rem; max-width: 100%; }
 table { width: 100%; border-collapse: collapse; background: #fff; }
 th, td { border: 1px solid #ccd3db; padding: 0.6rem; text-align: left; }
 caption { text-align: left; font-weight: bold; padding: 0.5rem 0; }
+css
+.comunicado { background: #fff; border: 1px solid #ccd3db; border-radius: 6px;
+              padding: 0.5rem 1rem; margin-bottom: 1rem; }
+.comunicado .meta { color: #4a5560; font-size: 0.95rem; margin-top: 0; }

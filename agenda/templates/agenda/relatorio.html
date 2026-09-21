@@ -1,0 +1,65 @@
+{% extends "agenda/base.html" %}
+{% block titulo %}Relatório de utilização{% endblock %}
+{% block conteudo %}
+<h1>Relatório de utilização</h1>
+
+<form method="get">
+  {{ form.as_p }}
+  <button type="submit">Gerar relatório</button>
+</form>
+
+{% if resultado %}
+<h2>Período: {{ resultado.inicio|date:"d/m/Y" }} a {{ resultado.fim|date:"d/m/Y" }}</h2>
+<ul>
+  <li>Agendamentos confirmados: <strong>{{ resultado.confirmados }}</strong></li>
+  <li>Agendamentos cancelados: <strong>{{ resultado.cancelados }}</strong></li>
+  <li>Taxa de ocupação geral: <strong>{{ resultado.ocupacao_geral }}%</strong></li>
+</ul>
+
+<div class="tabela-rolavel">
+  <table>
+    <caption>Uso por horário</caption>
+    <thead>
+      <tr>
+        <th scope="col">Horário</th>
+        <th scope="col">Reservas</th>
+        <th scope="col">Vagas no período</th>
+        <th scope="col">Ocupação</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in resultado.por_horario %}
+      <tr>
+        <td>{{ l.horario }}</td>
+        <td>{{ l.total }}</td>
+        <td>{{ l.vagas }}</td>
+        <td>{{ l.ocupacao }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="tabela-rolavel">
+  <table>
+    <caption>Uso por grupo</caption>
+    <thead>
+      <tr>
+        <th scope="col">Grupo</th>
+        <th scope="col">Reservas</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for g in resultado.por_grupo %}
+      <tr>
+        <td>{{ g.grupo__nome }}</td>
+        <td>{{ g.total }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="2">Sem reservas no período.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}
